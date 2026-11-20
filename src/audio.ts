@@ -156,6 +156,12 @@ class Sfx {
     this.tone(2637, 0.12, 'sine', 0.04, 0.02);
   }
 
+  /** A ball swallowed by the black hole (charging toward the wheel). */
+  bhGulp(level: number) {
+    this.tone(220 + level * 40, 0.35, 'sine', 0.12, 0, undefined, 70);
+    this.noise(0.3, 0.08, 1200, 200, 0, 'lowpass');
+  }
+
   warp() {
     this.tone(300, 0.7, 'sawtooth', 0.08, 0, undefined, 1800);
     this.tone(600, 0.7, 'sine', 0.1, 0.02, undefined, 2400);

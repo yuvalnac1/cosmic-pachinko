@@ -44,8 +44,9 @@ export class Hoops {
     this.lockedPower = this.power;
     const ea = Math.abs(this.lockedAim - this.hoopAim);
     const ep = Math.abs(this.lockedPower - T.hoopsPowerTarget);
-    if (ea <= T.hoopsSwishAim && ep <= T.hoopsSwishPower) this.result = 'swish';
-    else if (ea <= T.hoopsRimAim && ep <= T.hoopsRimPower) this.result = 'rim';
+    const hs = T.hoopsHoleSize;
+    if (ea <= T.hoopsSwishAim * hs && ep <= T.hoopsSwishPower) this.result = 'swish';
+    else if (ea <= T.hoopsRimAim * hs && ep <= T.hoopsRimPower) this.result = 'rim';
     else this.result = 'miss';
     this.phase = 'flight';
     this.flightT = 0;
@@ -171,7 +172,7 @@ export class Hoops {
     c.restore();
 
     // hoop = black hole vortex in a chrome ring
-    const rimW = 48 * s, rimH = rimW * 0.34;
+    const rimW = 48 * s * T.hoopsHoleSize, rimH = rimW * 0.34;
     const rimY = hy + 2 * s + bob;
     const bhs = art.blackhole;
     const ring = (front: boolean) => {

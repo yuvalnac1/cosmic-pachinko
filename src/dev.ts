@@ -35,6 +35,7 @@ const SLIDERS: Num[] = [
   { key: 'ufoReward', label: 'UFO reward', min: 1, max: 100, step: 1 },
   { key: 'hiddenReward', label: 'Hidden hole reward', min: 1, max: 200, step: 1 },
   { key: 'hiddenMaxSpeed', label: 'Hidden hole max speed', min: 550, max: 900, step: 1 },
+  { key: 'blackHoleBallsForWheel', label: 'Black hole balls → wheel', min: 1, max: 20, step: 1 },
   { key: 'blackHoleRadius', label: 'Black hole radius', min: 4, max: 40, step: 1 },
 ];
 
@@ -109,6 +110,7 @@ export function setupDev(game: Game) {
     row('Swish prize', () => T.hoopsPrize, (v) => (T.hoopsPrize = v), 10, 300, 10);
     row('Aim sweep speed', () => T.hoopsAimSpeed, (v) => (T.hoopsAimSpeed = v), 0.5, 5, 0.1);
     row('Power fill time (s)', () => T.hoopsPowerTime, (v) => (T.hoopsPowerTime = v), 0.3, 2, 0.05);
+    row('Hoops hole size (×)', () => T.hoopsHoleSize, (v) => (T.hoopsHoleSize = v), 0.5, 3, 0.05);
     row('Swish aim tolerance', () => T.hoopsSwishAim, (v) => (T.hoopsSwishAim = v), 0.01, 0.3, 0.01);
     row('Swish power tolerance', () => T.hoopsSwishPower, (v) => (T.hoopsSwishPower = v), 0.01, 0.3, 0.01);
     h('LIVE STATS');

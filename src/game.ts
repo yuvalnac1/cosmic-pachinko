@@ -97,6 +97,8 @@ export class Game {
   comets: { x: number; y: number; vx: number; vy: number; life: number; hue: number }[] = [];
   flashA = 0;
   kickFlash = 0;
+  bhCharge = 0; // balls swallowed toward the next Wheel of Fortune
+  bhGlow = 0;
   hoops: Hoops | null = null;
   lastFrac = -1; // power-meter position of the previous shot
   lastFracT = 0;
@@ -181,6 +183,7 @@ export class Game {
     this.comets = this.comets.filter((cm) => cm.life > 0);
     this.flashA = Math.max(0, this.flashA - dt * 2.2);
     this.kickFlash = Math.max(0, this.kickFlash - dt * 4);
+    this.bhGlow = Math.max(0, this.bhGlow - dt * 2);
     this.retFlash = Math.max(0, this.retFlash - dt * 2);
   }
 
@@ -490,7 +493,7 @@ export class Game {
       for (const b of this.balls) {
         const dx = BLACK_HOLE.x - b.x, dy = BLACK_HOLE.y - b.y;
         const d = Math.hypot(dx, dy);
-        if (d < 46 && (dx * b.vx + dy * b.vy) > 0) focus = true;
+        if (d < 46 && (dx * b.vx + dy * b.vy) > 0 && this.bhCharge >= T.blackHoleBallsForWheel - 1) focus = true;
       }
     }
     const paused = !!this.bhSeq || !!this.wheel || !!this.hoops;
@@ -1040,7 +1043,7 @@ export class Game {
       if (Math.hypot(b.x - BLACK_HOLE.x, b.y - BLACK_HOLE.y) < T.blackHoleRadius) {
         b.dead = true;
         this.stats.bh++;
-        this.enterBlackHole(b.x, b.y);
+        this.feedBlackHole(b.x, b.y);
         continue;
       }
 
@@ -1140,6 +1143,24 @@ export class Game {
     this.kickFlash = 1;
     sfx.kicker();
     for (let i = 0; i < 8; i++) this.spark((s.ax + s.bx) / 2, (s.ay + s.by) / 2, '#9ff', 1, Math.PI + (Math.random() - 0.5), 0.4, 260);
+  }
+
+  /** A ball fell into the black hole: charge it; the N-th ball opens the Wheel of Fortune. */
+  feedBlackHole(x: number, y: number) {
+    const need = Math.max(1, Math.round(T.blackHoleBallsForWheel));
+    this.bhCharge++;
+    this.bhGlow = 1;
+    if (this.bhCharge >= need) {
+      this.bhCharge = 0;
+      this.enterBlackHole(x, y);
+      return;
+    }
+    sfx.bhGulp(this.bhCharge);
+    this.popups.push({ x: BLACK_HOLE.x, y: BLACK_HOLE.y - 50, text: `${this.bhCharge}/${need}`, color: '#d6a8ff', life: 1, size: 26 });
+    for (let i = 0; i < 16; i++) {
+      const a = Math.random() * Math.PI * 2;
+      this.particles.push({ x: BLACK_HOLE.x + Math.cos(a) * 50, y: BLACK_HOLE.y + Math.sin(a) * 50, vx: -Math.cos(a) * 120, vy: -Math.sin(a) * 120, life: 0.4, max: 0.4, color: '#c78bff', size: 2.5, g: 0, kind: 'dot' });
+    }
   }
 
   enterBlackHole(x: number, y: number) {
@@ -1673,6 +1694,27 @@ export class Game {
     c.beginPath();
     c.arc(BLACK_HOLE.x, BLACK_HOLE.y, 14, 0, Math.PI * 2);
     c.fill();
+    // charge lights: one per ball needed to open the Wheel of Fortune
+    const need = Math.max(1, Math.round(T.blackHoleBallsForWheel));
+    if (need > 1) {
+      const ready = this.bhCharge === need - 1;
+      for (let i = 0; i < need; i++) {
+        const a = -Math.PI / 2 + (i / need) * Math.PI * 2;
+        const x = BLACK_HOLE.x + Math.cos(a) * 70, y = BLACK_HOLE.y + Math.sin(a) * 70;
+        const on = i < this.bhCharge;
+        const blink = ready && i === need - 1 && Math.floor(this.realTime * 6) % 2 === 0;
+        c.fillStyle = on ? '#f08bff' : blink ? '#ffd23c' : 'rgba(150,120,210,0.75)';
+        c.shadowColor = on ? '#e07bff' : '#ffd23c';
+        c.shadowBlur = on || blink ? 10 + this.bhGlow * 10 : 0;
+        c.beginPath();
+        c.arc(x, y, on ? 5.5 : 4, 0, Math.PI * 2);
+        c.fill();
+        c.strokeStyle = 'rgba(10,4,30,0.9)';
+        c.lineWidth = 1.5;
+        c.stroke();
+      }
+      c.shadowBlur = 0;
+    }
   }
 
   private drawOrbs(c: CanvasRenderingContext2D) {
@@ -2223,6 +2265,7 @@ export class Game {
       inPlay: this.balls.length,
       ballPos: this.balls.slice(0, 5).map((b) => [Math.round(b.x), Math.round(b.y), Math.round(b.vx), Math.round(b.vy)]),
       alienHits: this.alienHits,
+      bhCharge: this.bhCharge,
       fever: +this.feverT.toFixed(1),
       rain: +this.rainT.toFixed(1),
       wheel: this.wheel ? this.wheel.phase : null,

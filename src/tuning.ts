@@ -57,6 +57,7 @@ export const DEFAULTS = {
   ufoReward: 10,
   hiddenReward: 50,
   hiddenMaxSpeed: 634, // ball must be slower than this to drop into the hidden hole
+  blackHoleBallsForWheel: 5, // balls the black hole must swallow before the Wheel of Fortune opens
   blackHoleRadius: 5, // capture radius (board px)
   lastChanceOn: 1, // 1 = offer the Last Chance Wheel once per day at 0 balls
   lastChance: { quit: 40, b10: 14, b20: 14, b30: 7, rain: 12, jackpot: 3, hoops: 10 } as Record<LastChanceId, number>,
@@ -66,6 +67,7 @@ export const DEFAULTS = {
   hoopsAimSpeed: 2.2, // aim sweep speed (higher = harder)
   hoopsPowerTime: 0.9, // s to fill the power bar once
   hoopsPowerTarget: 0.72,
+  hoopsHoleSize: 1, // Space Hoops: black-hole hoop size (scales the visual AND the aim tolerance)
   hoopsSwishAim: 0.07,
   hoopsSwishPower: 0.07,
   hoopsRimAim: 0.16,
