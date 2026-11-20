@@ -157,13 +157,19 @@ async function boot() {
       if (deltaT <= 0) { deltaEl.textContent = ''; deltaSum = 0; }
     }
     $('bestLine').textContent = `Daily refill: ${T.dailyBalls} · Best: ${game.save.best}`;
+    const digital = game.alienNeed > 50;
+    pips.classList.toggle('hidden', digital);
+    $('alienBig').classList.toggle('hidden', !digital);
+    if (digital) $('alienBig').innerHTML = `${game.alienHits}<small> / ${game.alienNeed}</small>`;
+    $('bhBox').classList.toggle('hidden', !game.save.bhKnown);
+    if (game.save.bhKnown) $('bhBig').innerHTML = `${game.bhCharge}<small> / ${game.bhNeed}</small>`;
     if (pipN !== game.alienNeed) {
       pipN = game.alienNeed;
       pips.innerHTML = '';
       for (let i = 0; i < pipN; i++) pips.appendChild(Object.assign(document.createElement('div'), { className: 'pip' }));
     }
     Array.from(pips.children).forEach((p, i) => p.classList.toggle('on', i < game.alienHits));
-    $('alienLine').textContent = game.rainT > 0 ? `★ GOLDEN ALIEN — every hit pays! ${game.goldCombo ? `(${game.goldCombo} hits, +${game.goldWon})` : ''}` : `${game.alienHits} / ${pipN} hits → Ball Rain`;
+    $('alienLine').textContent = game.rainT > 0 ? `★ GOLDEN ALIEN — every hit pays! ${game.goldCombo ? `(${game.goldCombo} hits, +${game.goldWon})` : ''}` : digital ? 'hits → Ball Rain' : `${game.alienHits} / ${pipN} hits → Ball Rain`;
 
     $('fever').classList.toggle('hidden', game.feverT <= 0);
     if (game.feverT > 0) $('feverNum').textContent = String(Math.ceil(game.feverT));

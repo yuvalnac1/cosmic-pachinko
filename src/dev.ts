@@ -82,7 +82,8 @@ export function setupDev(game: Game) {
     btn('Welcome wheel', () => game.openWelcome());
     btn('Space Hoops', () => game.startHoops());
     btn('Secret hole', () => game.secretFound());
-    btn('Reset hit targets', () => { game.save.alienLevel = 0; game.save.bhLevel = 0; writeSave(game.save); });
+    btn('Alien target 60 + hole known', () => { game.save.alienLevel = 3; game.save.bhKnown = true; writeSave(game.save); });
+    btn('Reset hit targets', () => { game.save.alienLevel = 0; game.save.bhLevel = 0; game.save.bhKnown = false; writeSave(game.save); });
     btn('Set 0 balls', () => { game.save.balls = 0; writeSave(game.save); });
     el.appendChild(btns);
 

@@ -928,6 +928,9 @@ export class Game {
         this.screenFlash('#fff1b0', 0.9);
         this.emit('jackpot', `BLACK HOLE JACKPOT +${n}`, '#ffd23c');
         for (let i = 0; i < 160; i++) this.spark(CX, BLACK_HOLE.y, ['#ffd23c', '#fff', '#ff7bf2'][i % 3], 1, Math.random() * 6.28, 2, 900);
+        // jackpot = the full party: Ball Rain + Fever right away
+        this.startFever(k);
+        this.startRain(k);
         break;
       }
     }
@@ -1158,6 +1161,7 @@ export class Game {
     if (this.bhCharge >= need) {
       this.bhCharge = 0;
       this.save.bhLevel = (this.save.bhLevel || 0) + 1;
+      this.save.bhKnown = true;
       writeSave(this.save);
       if (T.bhWheelStep > 0) this.emit('bh', `Next wheel needs ${this.bhNeed} black-hole balls`, '#c78bff');
       this.enterBlackHole(x, y);
@@ -1884,7 +1888,16 @@ export class Game {
     } else {
       c.font = '700 14px Orbitron, sans-serif';
       c.fillStyle = '#d8ffc8';
-      c.fillText(`${this.alienHits}/${n}`, this.al.x, this.al.y + this.al.r + 40);
+      if (this.save.bhKnown) {
+        // both counters, digital: alien hits (green) and black-hole balls (purple)
+        const y = this.al.y + this.al.r + 40;
+        c.textAlign = 'right';
+        c.fillText(`ALIEN ${this.alienHits}/${n}`, this.al.x - 8, y);
+        c.textAlign = 'left';
+        c.fillStyle = '#e0a8ff';
+        c.fillText(`HOLE ${this.bhCharge}/${this.bhNeed}`, this.al.x + 8, y);
+        c.textAlign = 'center';
+      } else c.fillText(`${this.alienHits}/${n}`, this.al.x, this.al.y + this.al.r + 40);
     }
     this.drawCrown(c);
     // warp: the ball streaks down through the alien into the black hole

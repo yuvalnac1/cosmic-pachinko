@@ -9,6 +9,7 @@ export interface SaveData {
   lastChance?: string; // day the Last Chance Wheel was used
   welcomed?: boolean; // Welcome Wheel already spun
   alienLevel?: number; // Ball Rains earned from the alien today (raises the next target)
+  bhKnown?: boolean; // player has opened the wheel via the black hole at least once
   bhLevel?: number; // wheels opened by the black hole today (raises the next target)
 }
 
