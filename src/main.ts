@@ -173,7 +173,7 @@ async function boot() {
     if (game.rainT > 0) modes.push(`BALL RAIN · ${Math.ceil(game.rainT)}s`);
     mode.classList.toggle('hidden', modes.length === 0);
     mode.textContent = modes.join(' · ');
-    $('hint').classList.toggle('hidden', shotOnce || game.save.balls <= 0);
+    $('hint').classList.toggle('hidden', shotOnce || game.save.balls <= 0 || !!game.wheel || !!game.hoops);
 
     document.body.classList.toggle('minigame', !!game.hoops);
     document.body.classList.toggle('fever', game.feverT > 0);

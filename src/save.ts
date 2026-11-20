@@ -7,6 +7,7 @@ export interface SaveData {
   lastRefill: string; // YYYY-MM-DD local
   best: number;
   lastChance?: string; // day the Last Chance Wheel was used
+  welcomed?: boolean; // Welcome Wheel already spun
 }
 
 export function todayStr(d = new Date()) {

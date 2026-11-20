@@ -70,6 +70,8 @@ export const DEFAULTS = {
   hoopsSwishPower: 0.07,
   hoopsRimAim: 0.16,
   hoopsRimPower: 0.15,
+  welcomeOn: 1, // 1 = first-ever visit opens the Welcome Wheel
+  welcomeWheel: { b5: 8, b10: 22, b25: 20, rain: 22, fever: 22, jackpot: 6 } as Record<PrizeId, number>,
   wheel: { b5: 46, b10: 30, b25: 12, rain: 5, fever: 5, jackpot: 2 } as Record<PrizeId, number>,
 };
 
@@ -85,8 +87,8 @@ import CONFIG_FILE from '../tuning.config.json';
 function merge(t: Tuning, o: any) {
   if (!o || typeof o !== 'object') return;
   for (const k of Object.keys(t) as (keyof Tuning)[]) {
-    if (k === 'wheel') Object.assign(t.wheel, o.wheel ?? {});
-    else if (k === 'lastChance') Object.assign(t.lastChance, o.lastChance ?? {});
+    const def = (t as any)[k];
+    if (def && typeof def === 'object') Object.assign(def, o[k] ?? {}); // nested odds tables
     else if (o[k] !== undefined) (t as any)[k] = o[k];
   }
 }

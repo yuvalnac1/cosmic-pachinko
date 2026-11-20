@@ -36,7 +36,7 @@ interface Popup { x: number; y: number; text: string; color: string; life: numbe
 interface Wheel {
   angle: number; start: number; total: number; t: number; dur: number;
   result: number; phase: 'ready' | 'in' | 'spin' | 'result'; resultT: number; lastSlice: number; appear: number; sup: boolean;
-  kind: 'normal' | 'super' | 'last';
+  kind: 'normal' | 'super' | 'last' | 'welcome';
   slices: { id: string; label: string; color: string; result: string }[];
 }
 
@@ -141,6 +141,7 @@ export class Game {
     this.ufoTimer = T.ufoInterval;
     this.bulbs = makeBulbs();
     this.trayCount = Math.min(this.save.balls, TRAY_CAP);
+    if (T.welcomeOn && !this.save.welcomed) this.openWelcome();
   }
 
   /** 0 calm, 1 fever, 2 rain / super wheel / jackpot */
@@ -211,7 +212,8 @@ export class Game {
       return;
     }
     if (this.wheel?.phase === 'ready') {
-      this.spinLastChance();
+      if (this.wheel.kind === 'welcome') this.spinWelcome();
+      else this.spinLastChance();
       return;
     }
     if (this.charging || this.wheel || this.bhSeq) return;
@@ -343,6 +345,28 @@ export class Game {
     w.start = w.angle;
     w.total = target - w.angle;
     w.result = idx;
+  }
+
+  /** First visit: a free spin of the Wheel of Fortune with boosted special-mode odds. */
+  openWelcome() {
+    if (this.wheel) return;
+    const slices = WHEEL_PRIZES.map((p) => ({
+      id: p.id as string, color: p.color, label: p.label,
+      result: p.id === 'jackpot' ? 'JACKPOT +100' : p.id === 'rain' ? 'BALL RAIN!' : p.id === 'fever' ? 'FEVER MODE!' : `${p.label} BALLS`,
+    }));
+    this.wheel = { angle: 0, start: 0, total: 0, t: 0, dur: 5, result: 0, phase: 'ready', resultT: 0, lastSlice: -1, appear: 0, sup: false, kind: 'welcome', slices };
+    this.emit('welcome', 'Welcome! Spin the Wheel of Fortune — press SPACE', '#ffd23c');
+  }
+
+  private spinWelcome() {
+    const w = this.wheel!;
+    this.save.welcomed = true;
+    writeSave(this.save);
+    this.aimWheel(w, WHEEL_PRIZES.map((p) => Math.max(0, T.welcomeWheel[p.id])));
+    w.phase = 'spin';
+    w.t = 0;
+    sfx.lastChance();
+    sfx.shoot(1);
   }
 
   /** Out of balls: offer one free spin of the Last Chance Wheel (once per day). */
@@ -2129,19 +2153,20 @@ export class Game {
     c.textAlign = 'center';
     c.fillStyle = '#e9dcff';
     c.font = `900 ${Math.round(rad * 0.12)}px Orbitron, sans-serif`;
-    c.fillStyle = w.sup ? '#ffd23c' : w.kind === 'last' ? '#5cf2ff' : '#e9dcff';
-    c.fillText(w.sup ? '★ SUPER WHEEL ×2 ★' : w.kind === 'last' ? 'LAST CHANCE WHEEL' : 'WHEEL OF FORTUNE', cx, cy - rad - 50);
+    c.fillStyle = w.sup || w.kind === 'welcome' ? '#ffd23c' : w.kind === 'last' ? '#5cf2ff' : '#e9dcff';
+    c.fillText(w.sup ? '★ SUPER WHEEL ×2 ★' : w.kind === 'last' ? 'LAST CHANCE WHEEL' : w.kind === 'welcome' ? '★ WELCOME WHEEL ★' : 'WHEEL OF FORTUNE', cx, cy - rad - 50);
     if (w.phase === 'ready') {
       const fs = Math.round(Math.max(14, rad * 0.075));
       const py = Math.min(cy + rad + 40, v.h - fs * 3.2);
       c.globalAlpha = w.appear;
       c.fillStyle = 'rgba(8,4,26,0.92)';
-      c.strokeStyle = '#5cf2ff';
+      const welcome = w.kind === 'welcome';
+      c.strokeStyle = welcome ? '#ffd23c' : '#5cf2ff';
       c.lineWidth = 2;
-      c.beginPath(); c.roundRect(cx - fs * 13, py - fs * 1.1, fs * 26, fs * 3, fs * 0.8); c.fill(); c.stroke();
+      c.beginPath(); c.roundRect(cx - fs * 17, py - fs * 1.1, fs * 34, fs * 3, fs * 0.8); c.fill(); c.stroke();
       c.font = `700 ${fs}px Orbitron, sans-serif`;
       c.fillStyle = '#ffffff';
-      c.fillText('OUT OF BALLS — ONE FREE SPIN!', cx, py);
+      c.fillText(welcome ? 'WELCOME! YOUR FIRST SPIN IS ON THE HOUSE' : 'OUT OF BALLS — ONE FREE SPIN!', cx, py);
       c.globalAlpha = w.appear * (0.6 + 0.4 * Math.sin(this.realTime * 6));
       c.font = `900 ${Math.round(fs * 1.15)}px Orbitron, sans-serif`;
       c.fillStyle = '#5cf2ff';

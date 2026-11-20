@@ -76,6 +76,7 @@ export function setupDev(game: Game) {
     btn('Auto-play', () => (game.autoPlay = !game.autoPlay), () => game.autoPlay);
     btn('Alien +5 hits', () => { game.alienHits = Math.min(T.alienHitsForRain - 1, game.alienHits + 5); });
     btn('Last chance wheel', () => { game.save.balls = 0; game.save.lastChance = ''; game.outOfBalls = false; writeSave(game.save); });
+    btn('Welcome wheel', () => game.openWelcome());
     btn('Space Hoops', () => game.startHoops());
     btn('Secret hole', () => game.secretFound());
     btn('Set 0 balls', () => { game.save.balls = 0; writeSave(game.save); });
@@ -96,6 +97,9 @@ export function setupDev(game: Game) {
     h('WHEEL ODDS (weights)');
     for (const p of WHEEL_PRIZES) row(p.label, () => T.wheel[p.id], (v) => (T.wheel[p.id] = v), 0, 100, 1, true);
 
+    h('WELCOME WHEEL ODDS (first visit)');
+    row('Offer welcome wheel (1/0)', () => T.welcomeOn, (v) => (T.welcomeOn = v), 0, 1, 1);
+    for (const p of WHEEL_PRIZES) row(p.label, () => T.welcomeWheel[p.id], (v) => (T.welcomeWheel[p.id] = v), 0, 100, 1, 'welcome');
     h('LAST CHANCE ODDS (weights)');
     row('Offer last chance (1/0)', () => T.lastChanceOn, (v) => (T.lastChanceOn = v), 0, 1, 1);
     for (const id of Object.keys(T.lastChance) as (keyof typeof T.lastChance)[]) {
@@ -129,7 +133,7 @@ export function setupDev(game: Game) {
     });
   }
 
-  function row(label: string, get: () => number, set: (v: number) => void, min: number, max: number, step: number, odds: boolean | 'last' = false) {
+  function row(label: string, get: () => number, set: (v: number) => void, min: number, max: number, step: number, odds: boolean | 'last' | 'welcome' = false) {
     const r = document.createElement('div');
     r.className = 'row';
     const l = document.createElement('span');
@@ -144,7 +148,7 @@ export function setupDev(game: Game) {
     v.className = 'val';
     const show = () => {
       if (odds) {
-        const sum = Object.values(odds === 'last' ? T.lastChance : T.wheel).reduce((a, b) => a + b, 0) || 1;
+        const sum = Object.values(odds === 'last' ? T.lastChance : odds === 'welcome' ? T.welcomeWheel : T.wheel).reduce((a, b) => a + b, 0) || 1;
         v.textContent = `${Math.round((get() / sum) * 100)}%`;
       } else v.textContent = String(+get().toFixed(3));
     };
