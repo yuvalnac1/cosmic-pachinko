@@ -3,7 +3,7 @@ import { loadArt } from './assets';
 import { Game } from './game';
 import { setupDev } from './dev';
 import { sfx } from './audio';
-import { T, syncTuningFile } from './tuning';
+import { T, syncTuningFile, DEV_MENU } from './tuning';
 import { msToMidnight } from './save';
 import { W, H, CX } from './board';
 
@@ -58,7 +58,8 @@ async function boot() {
   const art = await loadArt();
   const game = new Game(canvas, art);
   $('loading').remove();
-  const dev = setupDev(game);
+  const dev = DEV_MENU ? setupDev(game) : { toggle() {} };
+  if (!DEV_MENU) $('devBtn').remove();
 
   // ---------- layout ----------
   const left = $('left'), right = $('right');
@@ -128,7 +129,7 @@ async function boot() {
   window.addEventListener('pointerup', () => game.pressEnd());
   window.addEventListener('pointercancel', () => game.cancelCharge());
 
-  $('devBtn').addEventListener('click', (e) => { dev.toggle(); (e.currentTarget as HTMLElement).blur(); });
+  if (DEV_MENU) $('devBtn').addEventListener('click', (e) => { dev.toggle(); (e.currentTarget as HTMLElement).blur(); });
   const muteBtn = $('muteBtn');
   const syncMute = () => (muteBtn.textContent = `♪ Sound: ${sfx.muted ? 'off' : 'on'} (M)`);
   muteBtn.addEventListener('click', () => { sfx.unlock(); sfx.setMuted(!sfx.muted); syncMute(); });

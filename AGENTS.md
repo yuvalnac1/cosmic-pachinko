@@ -2,6 +2,6 @@
 
 - **Commit and push every change** to `origin` = `https://github.com/yuvalnac1/cosmic-pachinko.git` (branch `main`).
   Plain `git push` works (HTTPS, macOS keychain credential).
-- `tuning.config.json` holds the designer's dev-menu values (source of truth). Never overwrite it with defaults;
-  add new settings to `DEFAULTS` in `src/tuning.ts` and they will be appended to the file automatically.
+- Tuning is FINAL: values are hard-coded constants in `DEFAULTS` (`src/tuning.ts`). The dev menu is disabled
+  (`DEV_MENU = false`); set it to `true` only for a new tuning pass.
 - Balance simulator: `npm run sim` (economy) and `npm run sim:strength`.
