@@ -12,7 +12,7 @@
   "kickerPower": 200,
   "hole2Size": 1.2,
   "hole3Size": 1,
-  "returnGap": 20,
+  "returnGap": 12,
   "crownHoleSize": 1,
   "crownReward": 3,
   "cupSpeed": 80,
