@@ -8,6 +8,20 @@ import { msToMidnight } from './save';
 import { W, H, CX } from './board';
 
 const $ = (id: string) => document.getElementById(id)!;
+// write-through caches: avoid DOM writes (style recalcs) when nothing changed
+const lastText = new Map<Element, string>();
+const lastHidden = new Map<Element, boolean>();
+const setText = (el: Element, t: string, html = false) => {
+  if (lastText.get(el) === t) return;
+  lastText.set(el, t);
+  if (html) el.innerHTML = t;
+  else el.textContent = t;
+};
+const setHidden = (el: Element, h: boolean) => {
+  if (lastHidden.get(el) === h) return;
+  lastHidden.set(el, h);
+  el.classList.toggle('hidden', h);
+};
 
 /** The logo art is on black: turn brightness into alpha so it floats over the backdrop. */
 function keyOutBlack(img: HTMLImageElement) {
@@ -132,6 +146,8 @@ async function boot() {
   };
   const pips = $('alienPips');
   let pipN = -1;
+  let pipOn = -1;
+  const bodyCls: Record<string, boolean> = {};
   let lastShown = -1, lastBalls = game.save.balls, deltaT = 0, deltaSum = 0;
   let shotOnce = false;
 
@@ -156,50 +172,64 @@ async function boot() {
       deltaT -= dt;
       if (deltaT <= 0) { deltaEl.textContent = ''; deltaSum = 0; }
     }
-    $('bestLine').textContent = `Daily refill: ${T.dailyBalls} · Best: ${game.save.best}`;
+    setText($('bestLine'), `Daily refill: ${T.dailyBalls} · Best: ${game.save.best}`);
     const digital = game.alienNeed > 50;
-    pips.classList.toggle('hidden', digital);
-    $('alienBig').classList.toggle('hidden', !digital);
-    if (digital) $('alienBig').innerHTML = `${game.alienHits}<small> / ${game.alienNeed}</small>`;
-    $('bhBox').classList.toggle('hidden', !game.save.bhKnown);
-    if (game.save.bhKnown) $('bhBig').innerHTML = `${game.bhCharge}<small> / ${game.bhNeed}</small>`;
+    setHidden(pips, digital);
+    setHidden($('alienBig'), !digital);
+    if (digital) setText($('alienBig'), `${game.alienHits}<small> / ${game.alienNeed}</small>`, true);
+    setHidden($('bhBox'), !game.save.bhKnown);
+    if (game.save.bhKnown) setText($('bhBig'), `${game.bhCharge}<small> / ${game.bhNeed}</small>`, true);
     if (pipN !== game.alienNeed) {
       pipN = game.alienNeed;
       pips.innerHTML = '';
+      pipOn = -1;
       for (let i = 0; i < pipN; i++) pips.appendChild(Object.assign(document.createElement('div'), { className: 'pip' }));
     }
-    Array.from(pips.children).forEach((p, i) => p.classList.toggle('on', i < game.alienHits));
-    $('alienLine').textContent = game.rainT > 0 ? `★ GOLDEN ALIEN — every hit pays! ${game.goldCombo ? `(${game.goldCombo} hits, +${game.goldWon})` : ''}` : digital ? 'hits → Ball Rain' : `${game.alienHits} / ${pipN} hits → Ball Rain`;
+    if (pipOn !== game.alienHits) {
+      pipOn = game.alienHits;
+      Array.from(pips.children).forEach((p, i) => p.classList.toggle('on', i < game.alienHits));
+    }
+    setText($('alienLine'), game.rainT > 0 ? `★ GOLDEN ALIEN — every hit pays! ${game.goldCombo ? `(${game.goldCombo} hits, +${game.goldWon})` : ''}` : digital ? 'hits → Ball Rain' : `${game.alienHits} / ${pipN} hits → Ball Rain`);
 
-    $('fever').classList.toggle('hidden', game.feverT <= 0);
-    if (game.feverT > 0) $('feverNum').textContent = String(Math.ceil(game.feverT));
-    $('rainBanner').classList.toggle('hidden', game.rainT <= 0);
-    if (game.rainT > 0) $('rainNum').textContent = String(Math.ceil(game.rainT));
+    setHidden($('fever'), game.feverT <= 0);
+    if (game.feverT > 0) setText($('feverNum'), String(Math.ceil(game.feverT)));
+    setHidden($('rainBanner'), game.rainT <= 0);
+    if (game.rainT > 0) setText($('rainNum'), String(Math.ceil(game.rainT)));
     const mode = $('modeBox');
     const modes: string[] = [];
     if (game.feverT > 0) modes.push(`FEVER ×${T.feverMultiplier} · ${Math.ceil(game.feverT)}s`);
     if (game.rainT > 0) modes.push(`BALL RAIN · ${Math.ceil(game.rainT)}s`);
-    mode.classList.toggle('hidden', modes.length === 0);
-    mode.textContent = modes.join(' · ');
-    $('hint').classList.toggle('hidden', shotOnce || game.save.balls <= 0 || !!game.wheel || !!game.hoops);
+    setHidden(mode, modes.length === 0);
+    setText(mode, modes.join(' · '));
+    setHidden($('hint'), shotOnce || game.save.balls <= 0 || !!game.wheel || !!game.hoops);
 
-    document.body.classList.toggle('minigame', !!game.hoops);
-    document.body.classList.toggle('fever', game.feverT > 0);
-    document.body.classList.toggle('rain', game.rainT > 0);
-    $('lastBalls').classList.toggle('hidden', !(game.save.balls <= 0 && !game.outOfBalls && !game.wheel && !game.hoops && !game.bhSeq));
-    $('out').classList.toggle('hidden', !game.outOfBalls);
+    if (bodyCls['minigame'] !== (!!game.hoops)) document.body.classList.toggle('minigame', (bodyCls['minigame'] = !!game.hoops));
+    if (bodyCls['fever'] !== (game.feverT > 0)) document.body.classList.toggle('fever', (bodyCls['fever'] = game.feverT > 0));
+    if (bodyCls['rain'] !== (game.rainT > 0)) document.body.classList.toggle('rain', (bodyCls['rain'] = game.rainT > 0));
+    setHidden($('lastBalls'), !(game.save.balls <= 0 && !game.outOfBalls && !game.wheel && !game.hoops && !game.bhSeq));
+    setHidden($('out'), !game.outOfBalls);
     if (game.outOfBalls) {
       const ms = msToMidnight();
       const s = Math.floor(ms / 1000);
-      $('countdown').textContent = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map((n) => String(n).padStart(2, '0')).join(':');
+      setText($('countdown'), [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map((n) => String(n).padStart(2, '0')).join(':'));
     }
   }
 
   // ---------- loop ----------
   let last = performance.now();
+  const perf = { frames: 0, acc: 0, worst: 0, fps: 0, avgMs: 0, renderMs: 0 };
   function frame(now: number) {
     const dt = (now - last) / 1000;
     last = now;
+    perf.frames++;
+    perf.acc += dt;
+    perf.worst = Math.max(perf.worst, dt);
+    if (perf.acc >= 1) {
+      perf.fps = Math.round(perf.frames / perf.acc);
+      perf.avgMs = +((perf.acc / perf.frames) * 1000).toFixed(1);
+      game.onPerf(perf.fps, perf.avgMs, perf.worst * 1000);
+      perf.frames = 0; perf.acc = 0; perf.worst = 0;
+    }
     game.update(dt);
     game.render();
     hud(dt);
@@ -209,7 +239,7 @@ async function boot() {
 
   // test-only bridge
   (globalThis as any).__OHMYGAME_PLAYTEST__ = {
-    snapshot: () => game.snapshot(),
+    snapshot: () => ({ ...game.snapshot(), perf: { fps: perf.fps, avgMs: perf.avgMs, q: game.quality } }),
     step: (ms: number) => {
       const n = Math.ceil(ms / 16);
       for (let i = 0; i < n; i++) game.update(Math.min(0.016, ms / 1000));

@@ -75,6 +75,7 @@ export function setupDev(game: Game) {
     btn('Spin the wheel', () => game.spinWheel());
     btn('Spin SUPER wheel', () => game.spinWheel(true));
     btn('Test WARP hole', () => game.startWarp());
+    btn('Quality: cycle', () => { game.quality = (game.quality + 2) % 3; window.dispatchEvent(new Event('resize')); });
     btn('Show hit areas', () => (game.showHitAreas = !game.showHitAreas), () => game.showHitAreas);
     btn('Auto-play', () => (game.autoPlay = !game.autoPlay), () => game.autoPlay);
     btn('Alien +5 hits', () => { game.alienHits = Math.min(T.alienHitsForRain - 1, game.alienHits + 5); });
@@ -184,7 +185,8 @@ export function setupDev(game: Game) {
       `hidden ${s.hidden}  rain ${s.rain}  fever ${s.fever}\n` +
       `crown +${s.crown} (${per(s.crown)})  warp ${s.warp} (${per(s.warp)})\n` +
       `last shot ${(game.lastShotStrength * 100).toFixed(0)}%  in play ${game.balls.length}\n` +
-      `next UFO ${game.ufo.active ? 'now' : game.ufoTimer.toFixed(0) + 's'}`;
+      `next UFO ${game.ufo.active ? 'now' : game.ufoTimer.toFixed(0) + 's'}\n` +
+      `FPS ${game.fps}  quality ${['low', 'medium', 'high'][game.quality]}`;
   }, 250);
 
   return {

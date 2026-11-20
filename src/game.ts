@@ -101,6 +101,24 @@ export class Game {
   pendingHoops = false; // secret hole → Space Hoops after the astronaut dance
   jackpotT = 0;
   showHitAreas = false;
+  /** 2 = full effects, 1 = no glow blur + lower resolution, 0 = minimal. Drops automatically if FPS sags. */
+  quality = 2;
+  private slowSecs = 0;
+  private bgCache: HTMLCanvasElement | null = null;
+  private fieldCache: HTMLCanvasElement | null = null;
+  fps = 0;
+  onPerf(fps: number, _avgMs: number, _worstMs: number) {
+    this.fps = fps;
+    if (fps < 45) this.slowSecs++;
+    else this.slowSecs = Math.max(0, this.slowSecs - 1);
+    if (this.slowSecs >= 2 && this.quality > 0) {
+      this.quality--;
+      this.slowSecs = 0;
+      const v = this.view;
+      this.resize(v.w, v.h, this.lastReserve[0], this.lastReserve[1], this.lastReserve[2]);
+    }
+  }
+  private lastReserve = [0, 0, 0];
   // spectacle layer
   rocks: { x: number; y: number; vx: number; vy: number; rot: number; vr: number; size: number; screen: boolean }[] = [];
   comets: { x: number; y: number; vx: number; vy: number; life: number; hue: number }[] = [];
@@ -139,7 +157,15 @@ export class Game {
 
   constructor(canvas: HTMLCanvasElement, art: Art) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d')!;
+    this.ctx = canvas.getContext('2d', { alpha: false })!;
+    // shadowBlur is the single most expensive canvas op in Chrome: gate it behind the quality level
+    const proto = Object.getPrototypeOf(this.ctx);
+    const desc = Object.getOwnPropertyDescriptor(proto, 'shadowBlur')!;
+    const self = this;
+    Object.defineProperty(this.ctx, 'shadowBlur', {
+      get() { return desc.get!.call(this); },
+      set(v: number) { desc.set!.call(this, self.quality >= 2 ? Math.min(v, 14) : 0); },
+    });
     this.art = art;
     this.save = loadSave();
     this.shownBalls = this.save.balls;
@@ -860,6 +886,8 @@ export class Game {
       p.vx *= 0.985;
     }
     this.particles = this.particles.filter((p) => p.life > 0);
+    const maxP = this.quality >= 2 ? 700 : this.quality === 1 ? 400 : 200;
+    if (this.particles.length > maxP) this.particles.splice(0, this.particles.length - maxP);
     for (const p of this.popups) {
       p.life -= realDt;
       p.y -= realDt * 40;
@@ -1300,7 +1328,10 @@ export class Game {
 
   // ---------------- layout ----------------
   resize(w: number, h: number, leftReserve: number, rightReserve: number, topReserve: number) {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    this.lastReserve = [leftReserve, rightReserve, topReserve];
+    const dpr = Math.min(this.quality >= 2 ? 1.5 : this.quality === 1 ? 1.25 : 1, window.devicePixelRatio || 1);
+    this.bgCache = null;
+    this.fieldCache = null;
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
     this.canvas.style.width = w + 'px';
@@ -1363,11 +1394,20 @@ export class Game {
 
   private drawBackdrop(c: CanvasRenderingContext2D) {
     const v = this.view;
-    const img = this.art.backdrop;
-    const sc = Math.max(v.w / img.width, v.h / img.height);
-    c.drawImage(img, (v.w - img.width * sc) / 2, (v.h - img.height * sc) / 2, img.width * sc, img.height * sc);
-    c.fillStyle = 'rgba(4,2,18,0.35)';
-    c.fillRect(0, 0, v.w, v.h);
+    if (!this.bgCache) {
+      // backdrop + dim baked once per resize at device resolution
+      const bc = document.createElement('canvas');
+      bc.width = Math.round(v.w * v.dpr);
+      bc.height = Math.round(v.h * v.dpr);
+      const g = bc.getContext('2d')!;
+      const img = this.art.backdrop;
+      const sc = Math.max(bc.width / img.width, bc.height / img.height);
+      g.drawImage(img, (bc.width - img.width * sc) / 2, (bc.height - img.height * sc) / 2, img.width * sc, img.height * sc);
+      g.fillStyle = 'rgba(4,2,18,0.35)';
+      g.fillRect(0, 0, bc.width, bc.height);
+      this.bgCache = bc;
+    }
+    c.drawImage(this.bgCache, 0, 0, v.w, v.h);
     // moving starfield (faster in Fever)
     const speed = this.feverT > 0 ? 0.9 : 0.04;
     const cx = v.w / 2, cy = v.h / 2;
@@ -1532,11 +1572,22 @@ export class Game {
   }
 
   private drawField(c: CanvasRenderingContext2D) {
-    const img = this.art.board;
-    const sc = Math.max(W / img.width, H / img.height);
-    c.drawImage(img, (W - img.width * sc) / 2, (H - img.height * sc) / 2, img.width * sc, img.height * sc);
-    c.fillStyle = 'rgba(6,4,24,0.5)';
-    c.fillRect(0, 0, W, H);
+    if (!this.fieldCache) {
+      // board art + dim baked once per resize (×1.5 headroom for the black-hole zoom)
+      const k = Math.min(2, this.view.s * this.view.dpr * 1.5);
+      const fc = document.createElement('canvas');
+      fc.width = Math.round(W * k);
+      fc.height = Math.round(H * k);
+      const g = fc.getContext('2d')!;
+      g.scale(k, k);
+      const img = this.art.board;
+      const sc = Math.max(W / img.width, H / img.height);
+      g.drawImage(img, (W - img.width * sc) / 2, (H - img.height * sc) / 2, img.width * sc, img.height * sc);
+      g.fillStyle = 'rgba(6,4,24,0.5)';
+      g.fillRect(0, 0, W, H);
+      this.fieldCache = fc;
+    }
+    c.drawImage(this.fieldCache, 0, 0, W, H);
     const fever = this.feverT > 0;
     if (fever) {
       const pulse = 0.5 + 0.5 * Math.cos((this.beat % 1) * Math.PI * 2);
