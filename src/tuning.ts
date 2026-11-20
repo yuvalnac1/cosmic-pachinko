@@ -58,6 +58,7 @@ export const DEFAULTS = {
   hiddenReward: 50,
   hiddenMaxSpeed: 634, // ball must be slower than this to drop into the hidden hole
   blackHoleBallsForWheel: 5, // balls the black hole must swallow before the Wheel of Fortune opens
+  warpCharge: 1, // how many black-hole balls a WARP-hole ball counts as
   blackHoleRadius: 5, // capture radius (board px)
   lastChanceOn: 1, // 1 = offer the Last Chance Wheel once per day at 0 balls
   lastChance: { quit: 40, b10: 14, b20: 14, b30: 7, rain: 12, jackpot: 3, hoops: 10 } as Record<LastChanceId, number>,

@@ -36,6 +36,7 @@ const SLIDERS: Num[] = [
   { key: 'hiddenReward', label: 'Hidden hole reward', min: 1, max: 200, step: 1 },
   { key: 'hiddenMaxSpeed', label: 'Hidden hole max speed', min: 550, max: 900, step: 1 },
   { key: 'blackHoleBallsForWheel', label: 'Black hole balls → wheel', min: 1, max: 20, step: 1 },
+  { key: 'warpCharge', label: 'WARP counts as N balls', min: 1, max: 20, step: 1 },
   { key: 'blackHoleRadius', label: 'Black hole radius', min: 4, max: 40, step: 1 },
 ];
 

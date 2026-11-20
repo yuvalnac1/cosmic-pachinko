@@ -520,7 +520,7 @@ export class Game {
       if (this.warp.t >= 0.75) {
         this.warp = null;
         this.stats.bh++;
-        this.enterBlackHole(BLACK_HOLE.x, BLACK_HOLE.y - 20);
+        this.feedBlackHole(BLACK_HOLE.x, BLACK_HOLE.y - 20, Math.max(1, Math.round(T.warpCharge)));
       }
     }
 
@@ -1146,9 +1146,9 @@ export class Game {
   }
 
   /** A ball fell into the black hole: charge it; the N-th ball opens the Wheel of Fortune. */
-  feedBlackHole(x: number, y: number) {
+  feedBlackHole(x: number, y: number, amount = 1) {
     const need = Math.max(1, Math.round(T.blackHoleBallsForWheel));
-    this.bhCharge++;
+    this.bhCharge += amount;
     this.bhGlow = 1;
     if (this.bhCharge >= need) {
       this.bhCharge = 0;
