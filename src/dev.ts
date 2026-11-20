@@ -17,7 +17,6 @@ const SLIDERS: Num[] = [
   { key: 'kickerPower', label: 'Right slingshot power', min: 0, max: 900, step: 10 },
   { key: 'hole2Size', label: '×2 UFO hatch size (×ball)', min: 0.5, max: 3, step: 0.05 },
   { key: 'hole3Size', label: '×3 rocket/dish hatch (×ball)', min: 0.5, max: 3, step: 0.05 },
-  { key: 'returnGap', label: 'Ball Back hole size', min: 8, max: 40, step: 1 },
   { key: 'crownHoleSize', label: 'Crown hole size (×ball r)', min: 0.6, max: 2.5, step: 0.05 },
   { key: 'crownReward', label: 'Crown side-hole reward', min: 0, max: 30, step: 1 },
   { key: 'cupSpeed', label: 'Lucky cup speed', min: 0, max: 300, step: 5 },
@@ -179,7 +178,7 @@ export function setupDev(game: Game) {
       `cup ${s.cup} (${per(s.cup)})  alien ${s.alien}\n` +
       `black hole ${s.bh} (${per(s.bh)})  ufo ${s.ufo}\n` +
       `hidden ${s.hidden}  rain ${s.rain}  fever ${s.fever}\n` +
-      `return ${s.ret} (${per(s.ret)})  crown +${s.crown} (${per(s.crown)})  warp ${s.warp} (${per(s.warp)})\n` +
+      `crown +${s.crown} (${per(s.crown)})  warp ${s.warp} (${per(s.warp)})\n` +
       `last shot ${(game.lastShotStrength * 100).toFixed(0)}%  in play ${game.balls.length}\n` +
       `next UFO ${game.ufo.active ? 'now' : game.ufoTimer.toFixed(0) + 's'}`;
   }, 250);

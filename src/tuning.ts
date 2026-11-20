@@ -39,7 +39,6 @@ export const DEFAULTS = {
   kickerPower: 200, // upper-right slingshot that throws strong shots back toward the alien
   hole2Size: 1.0, // × ball width
   hole3Size: 0.95,
-  returnGap: 13, // Ball Back pocket: half width of the opening (ball radius = 7)
   crownHoleSize: 0.8, // crown holes on top of the alien (× ball radius)
   crownReward: 3, // side crown holes (+ counts as an alien hit)
   cupSpeed: 80, // px/s

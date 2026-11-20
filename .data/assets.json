@@ -18,7 +18,8 @@
     "assets/imported/image-2.png": "c02b73bb-80ff-47f6-a067-ad4aa6a43a51",
     "assets/imported/output-12.png": "c44e10fb-ef96-45f8-a193-7c0c2a61e98a",
     "assets/imported/output-13.png": "5cb58331-edeb-49df-8b97-0de8e82a5d58",
-    "assets/imported/output-14.png": "5f3036e1-8400-4e90-90c4-86e9f7c14c27"
+    "assets/imported/output-14.png": "5f3036e1-8400-4e90-90c4-86e9f7c14c27",
+    "assets/imported/image-3.png": "12c49622-ca5d-4b85-ad2c-d80d1581706a"
   },
   "origins": {
     "assets/imported/image.png": "uploaded",
@@ -36,7 +37,8 @@
     "assets/imported/image-2.png": "uploaded",
     "assets/imported/output-12.png": "generated",
     "assets/imported/output-13.png": "generated",
-    "assets/imported/output-14.png": "generated"
+    "assets/imported/output-14.png": "generated",
+    "assets/imported/image-3.png": "uploaded"
   },
   "purposes": {
     "assets/imported/image.png": "reference",
@@ -54,6 +56,7 @@
     "assets/imported/image-2.png": "reference",
     "assets/imported/output-12.png": "asset",
     "assets/imported/output-13.png": "asset",
-    "assets/imported/output-14.png": "asset"
+    "assets/imported/output-14.png": "asset",
+    "assets/imported/image-3.png": "reference"
   }
 }

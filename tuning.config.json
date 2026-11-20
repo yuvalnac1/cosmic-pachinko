@@ -12,7 +12,6 @@
   "kickerPower": 200,
   "hole2Size": 1.1,
   "hole3Size": 1,
-  "returnGap": 12,
   "crownHoleSize": 1,
   "crownReward": 3,
   "cupSpeed": 80,
@@ -43,7 +42,7 @@
     "jackpot": 6,
     "hoops": 10
   },
-  "hoopsPrize": 100,
+  "hoopsPrize": 50,
   "hoopsRimPrize": 10,
   "hoopsAimSpeed": 2,
   "hoopsPowerTime": 0.8,

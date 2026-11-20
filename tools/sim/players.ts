@@ -132,7 +132,7 @@ if (!isMainThread) {
       rows[p] = { players: rs.length, 'core RTP %': +((sum((r) => r.coreWon, rs) / s) * 100).toFixed(1), 'avg shots': Math.round(s / rs.length), 'busted %': Math.round((100 * rs.filter((r) => r.bustedOut).length) / rs.length) };
     }
     console.table(rows);
-    const keys = ['x2', 'x3', 'cup', 'ret', 'alien', 'crown', 'warp', 'bh', 'rain', 'fever', 'ufo', 'hidden'];
+    const keys = ['x2', 'x3', 'cup', 'alien', 'crown', 'warp', 'bh', 'rain', 'fever', 'ufo', 'hidden'];
     const per1k: Record<string, number> = {};
     for (const k of keys) per1k[k] = +((sum((r) => r.stats[k] || 0) / shots) * 1000).toFixed(1);
     console.log('events per 1000 shots:', JSON.stringify(per1k));

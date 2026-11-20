@@ -6,7 +6,7 @@ import { Hoops, HoopsResult } from './hoops';
 import {
   W, H, CX, CY, R, BALL_R, PIN_R, SIDE_BOTTOM, DRAIN_Y, LEFT_X, RIGHT_X,
   PINS, SHIPS, ORBS, SEGS, ALIEN, BLACK_HOLE, HIDDEN, CUP_Y, CUP_HALF, CUP_MIN_X, CUP_MAX_X,
-  LAUNCH, UFO_Y, pinsNear, Ship, Circle, RETURN_HOLE, RETURN_HALF, RETURN_Y, setReturnGap, CROWN, CROWN_HOLES, CONSOLE, TRAY, HANDLE,
+  LAUNCH, UFO_Y, pinsNear, Ship, Circle, CROWN, CROWN_HOLES, CONSOLE, TRAY, HANDLE,
 } from './board';
 
 const G_BASE = 1000; // px/s² at gravity 1.0
@@ -102,7 +102,6 @@ export class Game {
   hoops: Hoops | null = null;
   lastFrac = -1; // power-meter position of the previous shot
   lastFracT = 0;
-  retFlash = 0;
   rainSuperUsed = false; // one Super Wheel per Ball Rain
   warp: { t: number; sup: boolean } | null = null;
   // console
@@ -118,7 +117,7 @@ export class Game {
   autoT = 0;
   outOfBalls = false;
   starfield: { x: number; y: number; z: number }[] = [];
-  stats = { ret: 0, warp: 0, crown: 0, shots: 0, x2: 0, x3: 0, cup: 0, alien: 0, bh: 0, ufo: 0, hidden: 0, drained: 0, rain: 0, fever: 0, won: 0 };
+  stats = { warp: 0, crown: 0, shots: 0, x2: 0, x3: 0, cup: 0, alien: 0, bh: 0, ufo: 0, hidden: 0, drained: 0, rain: 0, fever: 0, won: 0 };
   events: GameEvent[] = [];
   onEvent: (e: GameEvent) => void = () => {};
   // layout (css px)
@@ -184,7 +183,6 @@ export class Game {
     this.flashA = Math.max(0, this.flashA - dt * 2.2);
     this.kickFlash = Math.max(0, this.kickFlash - dt * 4);
     this.bhGlow = Math.max(0, this.bhGlow - dt * 2);
-    this.retFlash = Math.max(0, this.retFlash - dt * 2);
   }
 
   // ---------------- economy ----------------
@@ -921,7 +919,6 @@ export class Game {
 
   // ---------------- physics ----------------
   private physicsStep(dt: number) {
-    setReturnGap(T.returnGap);
     const g = G_BASE * T.gravity;
     for (const b of this.balls) {
       if (b.dead) continue;
@@ -1077,18 +1074,6 @@ export class Game {
           this.hitUfo();
           b.vy = Math.abs(b.vy) * 0.5 + 100;
         }
-      }
-
-      // return pocket (centre hole of the bottom ledge)
-      if (b.vy > 0 && Math.abs(b.x - RETURN_HOLE.x) < RETURN_HOLE.r && b.y > RETURN_HOLE.y && b.y < RETURN_HOLE.y + 20) {
-        b.dead = true;
-        this.stats.ret++;
-        this.retFlash = 1;
-        this.award(1, RETURN_HOLE.x, RETURN_HOLE.y - 34, '#5cf2ff', this.mult > 1 ? `+${this.mult} BACK` : 'BALL BACK');
-        sfx.cup();
-        this.particles.push({ x: RETURN_HOLE.x, y: RETURN_HOLE.y, vx: 0, vy: 0, life: 0.5, max: 0.5, color: '#5cf2ff', size: 40, g: 0, kind: 'ring' });
-        for (let i = 0; i < 12; i++) this.spark(RETURN_HOLE.x, RETURN_HOLE.y, '#9ff', 1, -Math.PI / 2 + (Math.random() - 0.5) * 2, 0.6, 260);
-        continue;
       }
 
       // lucky cup
@@ -1573,7 +1558,6 @@ export class Game {
     // wall kickers (chrome bars)
     c.lineCap = 'round';
     for (const s of SEGS.slice(2)) {
-      if (s.ledge) continue;
       if (s.ay === SIDE_BOTTOM) continue;
       c.strokeStyle = '#2a2350';
       c.lineWidth = 9;
@@ -1607,7 +1591,6 @@ export class Game {
     }
 
     this.drawAlien(c);
-    this.drawReturnPocket(c);
     this.drawCup(c);
     if (this.ufo.active) this.drawUfo(c);
 
@@ -1969,62 +1952,6 @@ export class Game {
     c.fillText('WARP', CROWN.x, CROWN.y - 10);
     c.fillStyle = '#9dff6a';
     for (const ch of CROWN_HOLES) if (ch.kind === 'side') c.fillText(`+${T.crownReward}`, CROWN.x + (ch.x - CROWN.x) * 0.45, CROWN.y + 22);
-    c.restore();
-  }
-
-  /** Chrome return-pocket housing: wide roof with the glowing opening at its peak (classic "start pocket"). */
-  private drawReturnPocket(c: CanvasRenderingContext2D) {
-    const cx = RETURN_HOLE.x;
-    const peak = RETURN_Y - 16, eave = RETURN_Y + 6, base = RETURN_Y + 30;
-    const L = cx - RETURN_HALF, R2 = cx + RETURN_HALF;
-    const fever = this.feverT > 0;
-    const edge = fever ? `hsl(${(this.realTime * 300) % 360},100%,65%)` : '#5cf2ff';
-    c.save();
-    // body
-    const g = c.createLinearGradient(0, peak, 0, base);
-    g.addColorStop(0, '#eef0fb');
-    g.addColorStop(0.5, '#8d93b8');
-    g.addColorStop(1, '#3b3f63');
-    c.fillStyle = g;
-    c.beginPath();
-    c.moveTo(cx - RETURN_HOLE.gap, peak);
-    c.lineTo(L, eave);
-    c.quadraticCurveTo(L + 4, base, L + 34, base);
-    c.lineTo(R2 - 34, base);
-    c.quadraticCurveTo(R2 - 4, base, R2, eave);
-    c.lineTo(cx + RETURN_HOLE.gap, peak);
-    c.lineTo(cx + RETURN_HOLE.gap, peak + 22);
-    c.lineTo(cx - RETURN_HOLE.gap, peak + 22);
-    c.closePath();
-    c.fill();
-    // opening (a dark chute between the roof halves)
-    c.shadowColor = this.retFlash > 0 ? '#ffffff' : edge;
-    c.shadowBlur = 12 + this.retFlash * 30;
-    c.fillStyle = '#05010f';
-    c.fillRect(cx - RETURN_HOLE.gap + 2, peak, RETURN_HOLE.gap * 2 - 4, 24);
-    c.shadowBlur = 0;
-    // neon roof edge
-    c.strokeStyle = edge;
-    c.shadowColor = edge;
-    c.shadowBlur = 10;
-    c.lineWidth = 3;
-    c.lineCap = 'round';
-    c.beginPath();
-    c.moveTo(cx - RETURN_HOLE.gap, peak); c.lineTo(L, eave);
-    c.moveTo(cx + RETURN_HOLE.gap, peak); c.lineTo(R2, eave);
-    c.stroke();
-    c.shadowBlur = 0;
-    // lights under the opening
-    for (let i = 0; i < 5; i++) {
-      const on = this.retFlash > 0 ? Math.floor(this.realTime * 20 + i) % 2 === 0 : Math.floor(this.realTime * 3 + i) % 5 === 0;
-      c.fillStyle = on ? '#ffb23c' : '#6b4020';
-      c.beginPath(); c.arc(cx - 40 + i * 20, base - 6, 2.8, 0, Math.PI * 2); c.fill();
-    }
-    c.font = '900 9px Orbitron, sans-serif';
-    c.textAlign = 'center';
-    c.textBaseline = 'middle';
-    c.fillStyle = '#1b1840';
-    c.fillText('BALL BACK', cx, base - 17);
     c.restore();
   }
 

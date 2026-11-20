@@ -12,7 +12,7 @@ export const DRAIN_Y = 990;
 export const LEFT_X = CX - R;
 export const RIGHT_X = CX + R;
 
-export interface Seg { ax: number; ay: number; bx: number; by: number; kick?: number; ledge?: boolean }
+export interface Seg { ax: number; ay: number; bx: number; by: number; kick?: number }
 export interface Pin { x: number; y: number; flash: number; hue: number }
 export interface Circle { x: number; y: number; r: number }
 
@@ -51,18 +51,6 @@ export const HIDDEN = (() => {
   return { x: CX + Math.sin(a) * rr, y: CY - Math.cos(a) * rr, r: 4 };
 })();
 export const CUP_Y = 918;
-/** Return pocket: a ball dropping into the centre hole is given back (+1). */
-export const RETURN_Y = 880;
-export const RETURN_HALF = 70; // half width of the housing roof
-export const RETURN_GAP_DEFAULT = 13; // half width of the opening at the peak (tunable: T.returnGap)
-export const RETURN_HOLE = { x: 400, y: RETURN_Y - 8, r: RETURN_GAP_DEFAULT - 1, gap: RETURN_GAP_DEFAULT };
-/** Resize the Ball Back opening live (moves the inner ends of the roof). */
-export function setReturnGap(gap: number) {
-  if (gap === RETURN_HOLE.gap) return;
-  RETURN_HOLE.gap = gap;
-  RETURN_HOLE.r = gap - 1;
-  for (const s of SEGS) if (s.ledge) s.ax = s.bx < CX ? CX - gap : CX + gap;
-}
 export const CUP_HALF = 46; // half width of mouth
 export const CUP_MIN_X = 150;
 export const CUP_MAX_X = 650;
@@ -115,10 +103,6 @@ export const SEGS: Seg[] = [
   { ax: RIGHT_X, ay: 430, bx: RIGHT_X - 58, by: 404, kick: 1 },
   ...[640, 790].map((y) => ({ ax: RIGHT_X, ay: y, bx: RIGHT_X - 26, by: y + 22 })),
   ...[600, 760].map((y) => ({ ax: LEFT_X, ay: y, bx: LEFT_X + 26, by: y + 22 })),
-  // return pocket housing above the cup: a wide chrome roof (∧) with the opening at the peak —
-  // balls landing on the roof roll off sideways; only a ball dropping straight in is returned
-  { ax: CX - RETURN_GAP_DEFAULT, ay: RETURN_Y - 16, bx: CX - RETURN_HALF, by: RETURN_Y + 6, ledge: true },
-  { ax: CX + RETURN_GAP_DEFAULT, ay: RETURN_Y - 16, bx: CX + RETURN_HALF, by: RETURN_Y + 6, ledge: true },
 ];
 
 /** Is a point inside the playfield with a given clearance from walls? */

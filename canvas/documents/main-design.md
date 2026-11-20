@@ -91,3 +91,4 @@ All SFX synthesised with WebAudio (pin notes, whoosh, clink, ouch blip, hum, tic
 - v0.9: **Hoops hole size** (`hoopsHoleSize`, ×1 default) scales the black-hole hoop visual and the swish/rim aim tolerance together.
 - v0.9: `npm run sim:players -- players=1000 cap=400` simulates many players (tapper/mid/power/random/learner personas, wheels and Hoops automated) in worker threads using tuning.config.json. It reports core return-to-player, per-persona return, bust rate and event rates.
 - v0.9.1 fix: the WARP hole no longer bypasses the black-hole counter. A warp ball now feeds the black hole like any other ball (`warpCharge` balls, default 1, dev menu "WARP counts as N balls"). Verified headless: with N=10 the wheel opens only on the 10th ball, warps included.
+- v0.9.2: removed the Ball Back pocket (and its returnGap setting); the sliding lucky cup is the only bottom catcher.
