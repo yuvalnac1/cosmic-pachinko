@@ -36,6 +36,8 @@ const SLIDERS: Num[] = [
   { key: 'hiddenMaxSpeed', label: 'Hidden hole max speed', min: 550, max: 900, step: 1 },
   { key: 'blackHoleBallsForWheel', label: 'Black hole balls → wheel', min: 1, max: 20, step: 1 },
   { key: 'warpCharge', label: 'WARP counts as N balls', min: 1, max: 20, step: 1 },
+  { key: 'alienRainStep', label: 'Alien target +N per Rain', min: 0, max: 40, step: 1 },
+  { key: 'bhWheelStep', label: 'Black hole target +N per wheel', min: 0, max: 20, step: 1 },
   { key: 'blackHoleRadius', label: 'Black hole radius', min: 4, max: 40, step: 1 },
 ];
 
@@ -80,6 +82,7 @@ export function setupDev(game: Game) {
     btn('Welcome wheel', () => game.openWelcome());
     btn('Space Hoops', () => game.startHoops());
     btn('Secret hole', () => game.secretFound());
+    btn('Reset hit targets', () => { game.save.alienLevel = 0; game.save.bhLevel = 0; writeSave(game.save); });
     btn('Set 0 balls', () => { game.save.balls = 0; writeSave(game.save); });
     el.appendChild(btns);
 

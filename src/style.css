@@ -56,6 +56,8 @@ kbd { font-family: var(--display); font-size: 11px; padding: 2px 8px; border-rad
 #feverNum { font-size: 96px; line-height: 1; color: #fff; text-shadow: 0 0 24px var(--neon-pink), 0 0 50px var(--neon-purple); }
 @keyframes hue { from { filter: hue-rotate(0); } to { filter: hue-rotate(360deg); } }
 #rainBanner { position: absolute; transform: translate(-50%, 0); font-family: var(--display); font-weight: 900; font-size: 26px; color: var(--neon-green); text-shadow: 0 0 16px var(--neon-green); letter-spacing: .1em; }
+#lastBalls { position: absolute; transform: translate(-50%, 0); font-family: var(--display); font-weight: 900; font-size: 22px; color: #ff7b9c; text-shadow: 0 0 14px #ff3b6b; white-space: nowrap; padding: 8px 18px; border-radius: 12px; background: rgba(10,4,30,.82); border: 1px solid #ff7b9c; animation: pulse 1.2s ease-in-out infinite; }
+#lastBalls span { font-size: 14px; color: #ffd0dc; text-shadow: none; }
 #hint { position: absolute; font-family: var(--display); font-size: 15px; color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); white-space: nowrap; animation: pulse 1.4s ease-in-out infinite; transform: translate(-100%, -50%); }
 @keyframes pulse { 50% { opacity: .45; } }
 

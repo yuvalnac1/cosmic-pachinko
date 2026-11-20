@@ -25,7 +25,7 @@ interface Ball {
   chain: number; lastPinT: number; lastPin: number;
   alienCd: number; ufoCd: number; goldDone?: boolean;
   ignoreHole: Ship | null; ignoreT: number;
-  slowT: number; dead: boolean; age: number;
+  slowT: number; stuckT?: number; dead: boolean; age: number;
   trail: { x: number; y: number }[];
 }
 interface Particle {
@@ -67,6 +67,15 @@ export class Game {
   cupDir = 1;
   cupGlow = 0;
   alienHits = 0;
+  /** Hits needed for the next alien Ball Rain (grows each time it's earned). */
+  get alienNeed() {
+    return Math.max(1, Math.round(T.alienHitsForRain + (this.save.alienLevel || 0) * T.alienRainStep));
+  }
+  /** Balls the black hole needs before the next wheel (grows each time it opens). */
+  get bhNeed() {
+    return Math.max(1, Math.round(T.blackHoleBallsForWheel + (this.save.bhLevel || 0) * T.bhWheelStep));
+  }
+  lastBallsNotice = false;
   alienWobble = 0;
   alienGone = 0; // >0 while exploded (brief, during the Ball Rain transformation)
   goldCombo = 0; // golden-alien hits this Ball Rain
@@ -220,6 +229,7 @@ export class Game {
     if (this.charging || this.wheel || this.bhSeq) return;
     if (this.save.balls <= 0) {
       sfx.drain();
+      if (!this.outOfBalls) this.popups.push({ x: W / 2, y: 470, text: 'NO BALLS LEFT', color: '#ff7b9c', life: 1.2, size: 30 });
       return;
     }
     this.charging = true;
@@ -491,7 +501,7 @@ export class Game {
       for (const b of this.balls) {
         const dx = BLACK_HOLE.x - b.x, dy = BLACK_HOLE.y - b.y;
         const d = Math.hypot(dx, dy);
-        if (d < 46 && (dx * b.vx + dy * b.vy) > 0 && this.bhCharge >= T.blackHoleBallsForWheel - 1) focus = true;
+        if (d < 46 && (dx * b.vx + dy * b.vy) > 0 && this.bhCharge >= this.bhNeed - 1) focus = true;
       }
     }
     const paused = !!this.bhSeq || !!this.wheel || !!this.hoops;
@@ -540,6 +550,12 @@ export class Game {
     }
 
     // out of balls
+    if (this.save.balls <= 0 && !this.outOfBalls && !this.wheel && !this.hoops) {
+      if (!this.lastBallsNotice) {
+        this.lastBallsNotice = true;
+        this.emit('out', 'Out of balls! Waiting for the last balls to land…', '#ff7b9c');
+      }
+    } else if (this.save.balls > 0) this.lastBallsNotice = false;
     const idle = this.balls.length === 0 && !this.hoops && !this.warp && this.rainT <= 0 && !this.bhSeq && !this.wheel && this.wheelQueue.length === 0;
     if (this.save.balls <= 0 && idle && !this.outOfBalls && T.lastChanceOn && this.save.lastChance !== todayStr()) {
       this.openLastChance();
@@ -1102,10 +1118,14 @@ export class Game {
       }
 
       // stuck guard
-      if (Math.hypot(b.vx, b.vy) < 12) {
+      const spd = Math.hypot(b.vx, b.vy);
+      if (spd < 12) {
         b.slowT += dt;
         if (b.slowT > 1.2) { b.vx += (Math.random() - 0.5) * 200; b.vy -= 80; b.slowT = 0; }
       } else b.slowT = 0;
+      // wedged balls (e.g. on a kicker tip) never stay slow-and-still for long: clear them
+      b.stuckT = spd < 60 ? (b.stuckT || 0) + dt : Math.max(0, (b.stuckT || 0) - dt * 2);
+      if (b.stuckT > 2.5) b.age = 999;
 
       if (b.y > DRAIN_Y || b.x < -40 || b.x > W + 40 || b.y < -60 || b.age > 40) {
         b.dead = true;
@@ -1132,11 +1152,14 @@ export class Game {
 
   /** A ball fell into the black hole: charge it; the N-th ball opens the Wheel of Fortune. */
   feedBlackHole(x: number, y: number, amount = 1) {
-    const need = Math.max(1, Math.round(T.blackHoleBallsForWheel));
+    const need = this.bhNeed;
     this.bhCharge += amount;
     this.bhGlow = 1;
     if (this.bhCharge >= need) {
       this.bhCharge = 0;
+      this.save.bhLevel = (this.save.bhLevel || 0) + 1;
+      writeSave(this.save);
+      if (T.bhWheelStep > 0) this.emit('bh', `Next wheel needs ${this.bhNeed} black-hole balls`, '#c78bff');
       this.enterBlackHole(x, y);
       return;
     }
@@ -1184,7 +1207,7 @@ export class Game {
     this.alienWobble = 1;
     sfx.crownHole();
     for (let i = 0; i < 16; i++) this.spark(x, y, '#9dff6a', 1, Math.random() * 6.28, 0.6, 300);
-    if (this.alienHits >= T.alienHitsForRain && this.rainT <= 0) this.startRain();
+    if (this.alienHits >= this.alienNeed && this.rainT <= 0) this.alienRain();
   }
 
   /** Ball Rain: the Golden Super Alien pays on every hit, more as the combo grows. */
@@ -1204,6 +1227,14 @@ export class Game {
     for (let i = 0; i < 14; i++) this.spark(x, y, ['#ffd23c', '#fff3b0', '#ff9a3c'][i % 3], 1, Math.random() * 6.28, 0.7, 340);
   }
 
+  /** The alien hit target was reached: Ball Rain, and the next target grows. */
+  private alienRain() {
+    this.save.alienLevel = (this.save.alienLevel || 0) + 1;
+    writeSave(this.save);
+    this.startRain();
+    if (T.alienRainStep > 0) this.emit('rain', `Next Ball Rain needs ${this.alienNeed} alien hits`, '#9dff6a');
+  }
+
   private hitAlien(b: Ball) {
     if (this.rainT > 0) {
       if (b.goldDone) { this.alienWobble = 0.5; return; } // each ball pays the golden alien once
@@ -1216,7 +1247,7 @@ export class Game {
     this.alienWobble = 1;
     sfx.alienOuch();
     for (let i = 0; i < 8; i++) this.spark(b.x, b.y, '#9dff6a', 1, Math.atan2(b.y - this.al.y, b.x - this.al.x) + (Math.random() - 0.5), 0.6, 260);
-    if (this.alienHits >= T.alienHitsForRain && this.rainT <= 0) this.startRain();
+    if (this.alienHits >= this.alienNeed && this.rainT <= 0) this.alienRain();
   }
 
   private enterShip(b: Ball, sh: Ship) {
@@ -1678,7 +1709,7 @@ export class Game {
     c.arc(BLACK_HOLE.x, BLACK_HOLE.y, 14, 0, Math.PI * 2);
     c.fill();
     // charge lights: one per ball needed to open the Wheel of Fortune
-    const need = Math.max(1, Math.round(T.blackHoleBallsForWheel));
+    const need = this.bhNeed;
     if (need > 1) {
       const ready = this.bhCharge === need - 1;
       for (let i = 0; i < need; i++) {
@@ -1782,7 +1813,7 @@ export class Game {
 
   private drawAlien(c: CanvasRenderingContext2D) {
     const s = this.art.alien;
-    const n = T.alienHitsForRain;
+    const n = this.alienNeed;
     this.drawGourd(c);
     // ring of lights (around the lower body, the crown sits on top)
     for (let i = 0; i < n; i++) {

@@ -31,6 +31,8 @@
   "hiddenMaxSpeed": 634,
   "blackHoleBallsForWheel": 10,
   "warpCharge": 1,
+  "alienRainStep": 10,
+  "bhWheelStep": 5,
   "blackHoleRadius": 9,
   "lastChanceOn": 1,
   "lastChance": {

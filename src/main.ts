@@ -81,6 +81,8 @@ async function boot() {
     Object.assign($('fever').style, { left: ft.x + 'px', top: ft.y + 'px' });
     const rt = game.toScreen(CX, 40);
     Object.assign($('rainBanner').style, { left: rt.x + 'px', top: rt.y + 'px' });
+    const lb = game.toScreen(CX, 470);
+    Object.assign($('lastBalls').style, { left: lb.x + 'px', top: lb.y + 'px' });
     const ht = game.toScreen(-56, 940);
     Object.assign($('hint').style, { left: ht.x + 'px', top: ht.y + 'px' });
   }
@@ -155,8 +157,8 @@ async function boot() {
       if (deltaT <= 0) { deltaEl.textContent = ''; deltaSum = 0; }
     }
     $('bestLine').textContent = `Daily refill: ${T.dailyBalls} · Best: ${game.save.best}`;
-    if (pipN !== T.alienHitsForRain) {
-      pipN = T.alienHitsForRain;
+    if (pipN !== game.alienNeed) {
+      pipN = game.alienNeed;
       pips.innerHTML = '';
       for (let i = 0; i < pipN; i++) pips.appendChild(Object.assign(document.createElement('div'), { className: 'pip' }));
     }
@@ -178,6 +180,7 @@ async function boot() {
     document.body.classList.toggle('minigame', !!game.hoops);
     document.body.classList.toggle('fever', game.feverT > 0);
     document.body.classList.toggle('rain', game.rainT > 0);
+    $('lastBalls').classList.toggle('hidden', !(game.save.balls <= 0 && !game.outOfBalls && !game.wheel && !game.hoops && !game.bhSeq));
     $('out').classList.toggle('hidden', !game.outOfBalls);
     if (game.outOfBalls) {
       const ms = msToMidnight();

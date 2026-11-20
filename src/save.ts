@@ -8,6 +8,8 @@ export interface SaveData {
   best: number;
   lastChance?: string; // day the Last Chance Wheel was used
   welcomed?: boolean; // Welcome Wheel already spun
+  alienLevel?: number; // Ball Rains earned from the alien today (raises the next target)
+  bhLevel?: number; // wheels opened by the black hole today (raises the next target)
 }
 
 export function todayStr(d = new Date()) {
@@ -37,6 +39,8 @@ export function applyRefill(s: SaveData): boolean {
   if (T.refillMode === 'add') s.balls += T.dailyBalls;
   else s.balls = Math.max(s.balls, T.dailyBalls);
   s.lastRefill = today;
+  s.alienLevel = 0; // escalating targets reset every new day
+  s.bhLevel = 0;
   writeSave(s);
   return true;
 }
