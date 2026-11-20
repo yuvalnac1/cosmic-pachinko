@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "nodes": [
+    {
+      "id": "doc",
+      "type": "document",
+      "title": "Main Design",
+      "data": {
+        "documentId": "main-design"
+      }
+    },
+    {
+      "id": "ref",
+      "type": "asset",
+      "title": "Reference: user machine image",
+      "description": "Mood reference only.",
+      "data": {
+        "assetId": "ref-machine",
+        "mediaType": "image"
+      }
+    },
+    {
+      "id": "gen-backdrop",
+      "type": "image",
+      "title": "PROD: page backdrop",
+      "description": "Full-window desktop backdrop behind the machine.",
+      "data": {
+        "prompt": "Wide deep-space backdrop: dark indigo starfield with soft purple and teal nebula clouds, a few distant galaxies, a small fiery red planet in the upper left corner, darker in the centre so a game board can sit on top. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. No text, no UI, no objects in the centre.",
+        "resolution": "1K",
+        "aspectRatio": "3:2",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "6978fd53-a914-4db0-8013-adc00d8096c8"
+      }
+    },
+    {
+      "id": "gen-board",
+      "type": "image",
+      "title": "PROD: board playfield",
+      "description": "Background inside the pachinko board (pins/objects are drawn on top in code).",
+      "data": {
+        "prompt": "Vertical pachinko playfield background art: deep navy-purple space with a subtle swirling galaxy glow in the centre, faint nebula wisps, tiny stars, a few small spiral galaxies near the edges, slightly vignetted. Flat and calm so pins and targets are readable on top. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. No pins, no balls, no characters, no text, no frame.",
+        "resolution": "1K",
+        "aspectRatio": "3:4",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "ac281903-c79d-46d5-824f-c08602a0208c"
+      }
+    },
+    {
+      "id": "gen-alien",
+      "type": "image",
+      "title": "PROD: alien boss in glass pod",
+      "description": "Centre target; wobbles when hit.",
+      "data": {
+        "prompt": "Cute mischievous green alien with two antennae and big eyes, waving four arms, sitting inside a glossy transparent glass dome on top of a chrome flying-saucer pod with orange lights, front view. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "1384f59a-c298-40c4-aaa4-f64549158468"
+      }
+    },
+    {
+      "id": "gen-blackhole",
+      "type": "image",
+      "title": "PROD: black hole",
+      "description": "Jackpot hole below the alien; drawn additively and rotated.",
+      "data": {
+        "prompt": "Top-down swirling black hole vortex: pitch-black centre, glowing purple, magenta and blue spiral accretion disk arms, bright sparkles, circular, centered on pure black background. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. No text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "532dc55b-77b1-4fc0-9060-04af0f9bba71"
+      }
+    },
+    {
+      "id": "gen-ufo",
+      "type": "image",
+      "title": "PROD: UFO",
+      "description": "Bonus target flying across the board.",
+      "data": {
+        "prompt": "Classic flying saucer UFO, side three-quarter view, chrome silver body with a cyan glass dome, ring of glowing pink and cyan lights around the rim. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "d0633394-428b-4677-8db3-62b376ea3f5c"
+      }
+    },
+    {
+      "id": "gen-cup",
+      "type": "image",
+      "title": "PROD: lucky cup",
+      "description": "Sliding catcher along the bottom of the board.",
+      "data": {
+        "prompt": "Wide shallow chrome sci-fi catcher tray/cup seen from the front, open on top, with glowing cyan neon trim and small orange lights, metallic and glossy, wider than tall. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "17654b61-73ce-430d-9d24-daeba58f6e20"
+      }
+    },
+    {
+      "id": "gen-astro",
+      "type": "image",
+      "title": "PROD: dancing astronaut (secret)",
+      "description": "Hidden-hole easter egg animation sprite.",
+      "data": {
+        "prompt": "Cheerful cartoon astronaut in a white and orange spacesuit with gold visor, dancing pose with one arm raised and one leg kicked, full body. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "fcfde551-7523-4bf5-b062-0bd374cb60c0"
+      }
+    },
+    {
+      "id": "gen-rocket",
+      "type": "image",
+      "title": "PROD: rocket target",
+      "description": "×3 multiplier ship target (lower-left). Ball enters hatch on top.",
+      "data": {
+        "prompt": "Small cute cartoon rocket ship standing upright, white and lavender hull with a round cyan porthole window, red-pink fins, bright orange and yellow flame exhaust at the bottom. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "65c1a309-a123-44b8-a076-c7d9f70e7a3a"
+      }
+    },
+    {
+      "id": "gen-dish",
+      "type": "image",
+      "title": "PROD: satellite dish target",
+      "description": "×3 multiplier target (lower-right). Ball enters dish.",
+      "data": {
+        "prompt": "Cartoon satellite radar dish on a small round neon platform base, silver dish tilted up-left with antenna, glowing magenta and cyan ring around the base platform. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "d7c45316-50ac-4cc4-b6fd-06f50be01ead"
+      }
+    },
+    {
+      "id": "gen-miniufo",
+      "type": "image",
+      "title": "PROD: mini UFO target",
+      "description": "×2 multiplier ship targets around the alien.",
+      "data": {
+        "prompt": "Small cute flying saucer, purple-magenta metallic body, glowing cyan glass dome on top, ring of tiny pink lights around the rim, soft pink tractor beam glow underneath, front three-quarter view. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "a56cce64-bd90-4ecd-9f4a-0611427c1665"
+      }
+    },
+    {
+      "id": "gen-asteroid",
+      "type": "image",
+      "title": "PROD: asteroid",
+      "description": "Decorative asteroid flying during special modes.",
+      "data": {
+        "prompt": "Single rocky cartoon asteroid, lumpy grey-brown rock with craters, faint glowing orange cracks, slight purple rim light. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure magenta (#FF00FF) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "2f9611da-73cb-41b1-9da6-13995e95de76"
+      }
+    },
+    {
+      "id": "gen-dial",
+      "type": "image",
+      "title": "PROD: launch handle dial",
+      "description": "Rotating launch handle wheel in the console (lever drawn in code). Rotates with Space charge.",
+      "data": {
+        "prompt": "Round pachinko launch handle wheel seen straight from the front, perfectly circular: thick glossy magenta-red neon outer ring, brushed chrome inner disc with radial grip notches around the edge, small cyan glowing indicator dot near the top edge, polished chrome centre hub cap. Polished glossy cartoon sci-fi casino game art, vibrant neon purple, cyan, magenta and gold accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure green (#00FF00) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "c44e10fb-ef96-45f8-a193-7c0c2a61e98a"
+      }
+    },
+    {
+      "id": "gen-alien-gold",
+      "type": "image",
+      "title": "PROD: golden super alien (Ball Rain)",
+      "description": "Ball Rain variant of the alien boss: same character powered up, gold and fiery. Every hit during Ball Rain pays balls.",
+      "data": {
+        "prompt": "The same cute green alien character from the reference image, now POWERED UP: glowing golden skin with sparkles, wide excited open-mouth grin, star-shaped eyes, antennae crackling with electric energy, all four arms raised in celebration, sitting in the same glass dome on the flying-saucer pod but the pod is now shiny gold with rainbow lights, surrounded by a fiery orange-gold energy aura and small coins flying around. Front view, same framing and proportions as the reference alien. Polished glossy cartoon sci-fi casino game art, vibrant gold, magenta and cyan accents, crisp clean edges, high detail. Isolated single object centered, fully visible with margin, on a perfectly flat solid pure green (#00FF00) background, no shadow on background, no text.",
+        "resolution": "1K",
+        "aspectRatio": "1:1",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "gen-alien"
+          }
+        ],
+        "assetId": "5cb58331-edeb-49df-8b97-0de8e82a5d58"
+      }
+    },
+    {
+      "id": "gen-logo",
+      "type": "image",
+      "title": "PROD: Cosmic Pachinko logo",
+      "description": "Title logo shown above the machine (screen-blended over the backdrop).",
+      "data": {
+        "prompt": "Game title logo reading exactly \"COSMIC PACHINKO\" in two lines: \"COSMIC\" on top in bold chrome-and-cyan neon sci-fi letters, \"PACHINKO\" below, bigger, in glossy hot-magenta to gold gradient 3D letters with a chrome bevel and bright neon glow. A small silver pachinko ball orbiting the letters with a glowing ring trail like a planet ring, tiny stars and sparkles around. Arcade casino energy, polished glossy cartoon sci-fi game art, crisp clean edges, high detail. Centered, wide horizontal composition, on a perfectly flat pure black background, no other text.",
+        "resolution": "1K",
+        "aspectRatio": "16:9",
+        "images": [
+          {
+            "type": "node",
+            "nodeId": "ref"
+          }
+        ],
+        "assetId": "5f3036e1-8400-4e90-90c4-86e9f7c14c27"
+      }
+    }
+  ],
+  "edges": [],
+  "id": "2eeea7e8-b774-42a8-98c4-57aa07e81dbe"
+}

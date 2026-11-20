@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "mainDocumentId": "main-design",
+  "boards": [
+    {
+      "id": "2eeea7e8-b774-42a8-98c4-57aa07e81dbe",
+      "name": "Cosmic Pachinko"
+    }
+  ],
+  "documents": [
+    { "id": "main-design", "title": "Cosmic Pachinko — Main Design" }
+  ]
+}

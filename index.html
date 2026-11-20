@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmic Pachinko</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="hud">
+      <header id="title"><div class="logo-wrap"><img id="logo" src="./art/logo.jpg" alt="Cosmic Pachinko" /><div class="logo-shine"></div></div></header>
+
+      <section id="left" class="panel">
+        <div class="label">BALLS</div>
+        <div id="balls" class="balls">100</div>
+        <div id="ballDelta" class="delta"></div>
+        <div class="sub" id="bestLine">Daily refill: 100</div>
+        <div id="modeBox" class="mode hidden"></div>
+        <div class="howto">
+          <div><kbd>SPACE</kbd> hold to charge, release to shoot</div>
+          <div class="dim">Tap = weak, left side · Long hold = loops over the top</div>
+        </div>
+      </section>
+
+      <section id="right" class="panel">
+        <div class="label">ALIEN BOSS</div>
+        <div id="alienPips" class="pips"></div>
+        <div class="sub" id="alienLine">0 / 20 hits → Ball Rain</div>
+        <div class="label sm">LOG</div>
+        <ul id="log"></ul>
+        <div class="foot"><span id="muteBtn" class="btn-link">♪ Sound: on (M)</span></div>
+      </section>
+
+      <div id="fever" class="hidden"><div class="ftitle">FEVER ×2</div><div id="feverNum">20</div></div>
+      <div id="rainBanner" class="hidden">BALL RAIN <span id="rainNum">10</span></div>
+      <div id="hint">Hold <kbd>SPACE</kbd> … release!</div>
+
+      <div id="out" class="hidden">
+        <div class="obox">
+          <div class="otitle">Out of balls</div>
+          <p>Come back tomorrow for your 100 balls.</p>
+          <div id="countdown">--:--:--</div>
+          <div class="dim">until your next refill</div>
+        </div>
+      </div>
+      <div id="loading">Loading the cosmos…</div>
+    </div>
+    <button id="devBtn" title="Developer menu ( ` )">DEV</button>
+    <div id="dev" class="hidden"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

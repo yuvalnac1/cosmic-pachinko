@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "nodes": {
+    "doc": {
+      "x": 96,
+      "y": 96
+    },
+    "ref": {
+      "x": 96,
+      "y": 576
+    },
+    "gen-backdrop": {
+      "x": 96,
+      "y": 1056
+    },
+    "gen-board": {
+      "x": 656,
+      "y": 96
+    },
+    "gen-alien": {
+      "x": 656,
+      "y": 576
+    },
+    "gen-blackhole": {
+      "x": 656,
+      "y": 1056
+    },
+    "gen-ufo": {
+      "x": 1216,
+      "y": 96
+    },
+    "gen-cup": {
+      "x": 1216,
+      "y": 576
+    },
+    "gen-astro": {
+      "x": 1216,
+      "y": 1056
+    },
+    "gen-rocket": {
+      "x": 1776,
+      "y": 96
+    },
+    "gen-dish": {
+      "x": 1776,
+      "y": 576
+    },
+    "gen-miniufo": {
+      "x": 1776,
+      "y": 1056
+    },
+    "gen-asteroid": {
+      "x": 2336,
+      "y": 96
+    },
+    "gen-dial": {
+      "x": 2896,
+      "y": 96
+    },
+    "gen-alien-gold": {
+      "x": 3456,
+      "y": 96
+    },
+    "gen-logo": {
+      "x": 4016,
+      "y": 96
+    }
+  },
+  "viewport": {
+    "x": 64,
+    "y": 32,
+    "zoom": 1
+  },
+  "view": "canvas"
+}
